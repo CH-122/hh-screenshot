@@ -7,26 +7,42 @@ import * as path from 'path';
 @Injectable()
 export class AppService {
   async getHello() {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      defaultViewport: {
+        width: 690,
+        height: 1990,
+      },
+    });
     const page = await browser.newPage();
 
     // await page.goto('https://juejin.cn/', { waitUntil: 'networkidle2' });
-    await page.goto('https://www.eduplus.net/home/index', {
-      waitUntil: 'networkidle2',
-    });
+    await page.goto(
+      'https://dev-uc.qstcloud.net/login?theme=athena&layout=eyJsYXlvdXRUeXBlIjoiZW50ZXJwcmlzZSJ9&redirect_uri=https://dev-athena.qstcloud.net/hr/login',
+      {
+        waitUntil: 'networkidle2',
+      },
+    );
     // await page.goto('https://www.baidu.com/');
 
     // await page.waitForNavigation({ timeout: 60000 });
 
     // 生成截图
-    const imgBuffer = await page.screenshot({ path: 'screenshot.png' });
+    // const imgBuffer = await page.screenshot({ path: 'screenshot.png' });
 
-    console.log(1111);
+    const el = await page.waitForSelector('#app');
 
-    console.log(imgBuffer);
+    const imgBuffer = await el.screenshot();
+
+    const testBuffer = await page.pdf({
+      path: 'page.pdf',
+      format: 'A4',
+      printBackground: true,
+    });
+
+    console.log(testBuffer);
 
     // 关闭浏览器实例
-    await browser.close();
+    // await browser.close();
 
     // res.setHeader('Content-Type', 'application/octet-stream');
     // res.setHeader('Content-Disposition', 'attachment; filename=test.png'); // 替换为实际文件名和扩展名
@@ -102,7 +118,7 @@ export class AppService {
 
     // 读取模板文件
     const template = fs.readFileSync(
-      path.resolve(__dirname, '..', 'template', 'index.hbs'),
+      path.resolve(__dirname, '..', 'template', 'index2.hbs'),
       'utf8',
     );
 
@@ -134,13 +150,27 @@ export class AppService {
     // 生成截图
     const imgBuffer = await el.screenshot({ type: 'jpeg', quality: 60 });
 
+    const pdfBuffer = await page.pdf({
+      path: 'page2.pdf',
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        // 设置页边距
+        top: '1cm', // 页眉需要额外的空间
+        right: '1cm',
+        bottom: '1cm',
+        left: '1cm',
+      },
+    });
+
     // 关闭浏览器实例
     await browser.close();
 
     // 保存截图到服务器
     const fileName = `test_${Date.now()}.png`; // 设置文件名
+    const pdfFileName = `test_${Date.now()}.pdf`; // 设置文件名
     // fs.writeFileSync(fileName, imgBuffer);
 
-    return { fileName, imgBuffer };
+    return { fileName, imgBuffer, pdfFileName, pdfBuffer };
   }
 }

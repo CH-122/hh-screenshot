@@ -28,14 +28,20 @@ export class AppController {
   @Get('template')
   async template(@Res() res: Response) {
     try {
-      const { fileName, imgBuffer } = await this.appService.template();
-      res.setHeader('Content-Type', 'image/png');
+      // const { fileName, imgBuffer } =
+      const { pdfFileName, pdfBuffer } = await this.appService.template();
+      // res.setHeader('Content-Type', 'image/png');
+      // res.setHeader(
+      //   'Content-Disposition',
+      //   `attachment; filename="${fileName}"`,
+      // );
+      // res.send(imgBuffer);
+      res.setHeader('Content-Type', 'application/pdf');
       res.setHeader(
         'Content-Disposition',
-        `attachment; filename="${fileName}"`,
+        `attachment; filename="${pdfFileName}"`,
       );
-
-      res.send(imgBuffer);
+      res.send(pdfBuffer);
     } catch (error) {
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
@@ -49,4 +55,7 @@ export class AppController {
     //   });
     // });
   }
+
+  // @Post('link')
+  // link(@Query() )
 }
